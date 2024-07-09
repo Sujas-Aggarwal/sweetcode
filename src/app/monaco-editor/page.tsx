@@ -121,7 +121,9 @@ function Page() {
                             await axios
                                 .post("/api/execute", {
                                     language: fileName.toLowerCase(),
-                                    code: codeValues[fileName] || files[fileName].default,
+                                    code:
+                                        codeValues[fileName] ||
+                                        files[fileName].default,
                                 })
                                 .then((res) => {
                                     setFiles((prev) => ({
@@ -131,13 +133,22 @@ function Page() {
                                             output: res.data.output,
                                         },
                                     }));
+                                    if (files[fileName].output == "") {
+                                        setFiles((prev) => ({
+                                            ...prev,
+                                            [fileName]: {
+                                                ...prev[fileName],
+                                                output: res.data.stderr.slice(135),
+                                            },
+                                        }));
+                                    }
                                 })
                                 .catch((err) => {
                                     setFiles((prev) => ({
                                         ...prev,
                                         [fileName]: {
                                             ...prev[fileName],
-                                            output: err.response.data.output,
+                                            output: err.response.data.error,
                                         },
                                     }));
                                 });
